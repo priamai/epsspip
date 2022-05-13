@@ -8,6 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Status(object):
+    '''
+    Simple wrapper object for the EPSS status
+    '''
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -35,7 +38,7 @@ class EPSS():
             self.validate_date(date)
             day_url = self.raw_url + 'epss_scores-{date}.csv.gz'
         else:
-            raise Exception('Date is invalid')
+            raise Exception(f'Date {date} is invalid')
 
         epss_df = pd.read_csv(day_url, compression='gzip', sep=',')
         if len(epss_df) > 0:
@@ -49,11 +52,10 @@ class EPSS():
                 num_df['epss'] = num_df['epss'].astype('float')
                 num_df['percentile'] = num_df['percentile'].astype('float')
                 num_df['date'] = date
-                # num_df.set_index('cve',inplace=True)
                 status = Status(version=version, score_date=score_date)
                 return num_df, status
             else:
-                raise Exception('EPSS format is malformed')
+                raise Exception(f'EPSS header {header} is malformed')
 
     def get(self, cve=None, envelope: bool = True, pretty: bool = False, offset: int = None, limit: int = None,
             order: bool = True, sort_fields: list = None,
@@ -112,7 +114,7 @@ class EPSS():
                 df = pd.concat(tmp)
                 df.set_index('cve', inplace=True)
             else:
-                raise Exception('Scope not supported')
+                raise Exception(f'Scope {scope} not supported')
 
             del data_status['data']
             if envelope is True:
