@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import datetime
 import logging
 
+# create logger
+logger = logging.getLogger(__name__)
 
 class Status(object):
     def __init__(self, **kwargs):
@@ -17,6 +19,7 @@ class EPSS():
     def __init__(self, api_url='https://api.first.org/data/v1/'):
         self.api_url = api_url
         self.raw_url = "https://epss.cyentia.com/"
+        self.logger = logging.getLogger('epss.EPSS')
 
     def validate_date(self, date_text):
         try:
@@ -36,7 +39,6 @@ class EPSS():
 
         epss_df = pd.read_csv(day_url, compression='gzip', sep=',')
         if len(epss_df) > 0:
-            logging.info('Done with total rows = %d' % len(epss_df))
             header = epss_df.iloc[0]
             if len(header) == 2:
                 version = header.index[0].split(':')[1]
